@@ -28,24 +28,38 @@ def insertImage(l_img, s_img, x, y, theta):
 
     s_img = boundedRotation(s_img, theta)
 
-    halfY1 = int(s_img.shape[0] / 2)
-    halfX1 = int(s_img.shape[1] / 2)
-    halfY2 = s_img.shape[0] - halfY1
-    halfX2 = s_img.shape[1] - halfX1
+    y = int(y * (l_img.shape[0] / 78))
 
-    l_img[y-halfY1:y+halfY2, x-halfX1:x+halfX2] = s_img
+    # halfY1 = int(s_img.shape[0] / 2)
+    # halfX1 = int(s_img.shape[1] / 2)
+    # halfY2 = s_img.shape[0] - halfY1
+    # halfX2 = s_img.shape[1] - halfX1
+
+    for row in range (0, s_img.shape[0]-1):
+        for col in range (0, s_img.shape[1]-1):
+            if (len(s_img[row][col]) > 2):
+                if (s_img[row][col][3] != 0):
+                    l_img[y + row][x + col] = s_img[row][col]
+                    #l_img[y-halfY1 + row][x-halfX1 + col] = s_img[row][col]
+                    #l_img[y-halfY1:y+halfY2, x-halfX1:x+halfX2] = s_img
 
     return l_img
 
+def insertMatrix(l_mat, s_mat, x, y, theta):
+    l_mat[y:y+s_mat.shape[0], x:x+s_mat.shape[1]] = s_mat
+    return l_mat
 
 def insertComponent(board, component):
     
     print("Inserting " + component.name + " at  (" + str(component.x) + ", " + str(component.y) + ")")
-    componentImg = cv2.imread('images/' + component.name + '.png')
-    print(componentImg[0, 0])
-
-    print("Width: " + str(componentImg.shape[1]) + ", Height: " + str(componentImg.shape[0]))
+    componentImg = cv2.imread('images/' + component.name + '.png', cv2.IMREAD_UNCHANGED)
+    print("Width: " + str(componentImg.shape[1]) + ", Height: " + str(componentImg.shape[0]) + '\n')
     return insertImage(board, componentImg, component.x, component.y, component.theta)
+
+
+def printMatrix(matrix):
+    for row in matrix:
+        print([x for x in row])
 
 
 def drawSolder(board, x0, y0, x1, y1):
