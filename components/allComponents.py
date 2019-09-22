@@ -14,36 +14,36 @@ arduino = {
 	'arduino13':[53, 2],
 	'arduino14':[57, 2],
 	'arduino15':[61, 2],
-	'arduino30':[5, 27],
-	'arduino29':[9, 27],
-	'arduino28':[13, 27],
-	'arduino27':[17, 27],
-	'arduino26':[21, 27],
-	'arduino25':[25, 27],
-	'arduino24':[29, 27],
-	'arduino23':[33, 27],
-	'arduino22':[37, 27], 
-	'arduino21':[41, 27],
-	'arduino20':[45, 27],
-	'arduino19':[49, 27],
-	'arduino18':[53, 27],
-	'arduino17':[57, 27],
-	'arduino16':[61, 27]
+	'arduino30':[5, 26],
+	'arduino29':[9, 26],
+	'arduino28':[13, 26],
+	'arduino27':[17, 26],
+	'arduino26':[21, 26],
+	'arduino25':[25, 26],
+	'arduino24':[29, 26],
+	'arduino23':[33, 26],
+	'arduino22':[37, 26], 
+	'arduino21':[41, 26],
+	'arduino20':[45, 26],
+	'arduino19':[49, 26],
+	'arduino18':[53, 26],
+	'arduino17':[57, 26],
+	'arduino16':[61, 26]
 }
 
 resistor = {
-	'resistor1':[0, 0],
-	'resistor2':[0, 1]
+	'resistor1':[1, 0],
+	'resistor2':[1, 1]
 }
 
 button = {
-	'button1':[0, 0],
-	'button2':[3, 4]
+	'button1':[1, 0],
+	'button2':[7, 9]
 }
 
 buzzer = {
-	'buzzer1':[3, 0],
-	'buzzer2':[3, 6]
+	'buzzer2':[7, 1],
+	'buzzer1':[7, 14]
 }
 
 allComponents = {

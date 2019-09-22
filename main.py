@@ -27,8 +27,8 @@ print("Board image width: " + str(boardImage.shape[1]) + ", board image height: 
 boardMatrix = np.zeros((ARDUINO_HEIGHT, ARDUINO_WIDTH), dtype=np.int)
 print("Board matrix width: " + str(boardMatrix.shape[1]) + ", board matrix height: " + str(boardMatrix.shape[0]) + '\n')
 
-cv2.imshow('Board image', boardImage)
-cv2.waitKey(0)
+# cv2.imshow('Board image', boardImage)
+# cv2.waitKey(0)
 
 # 2. PLACE ARDUINO ON IMAGE AND ARRAY IN PREDEFINED LOCATION
 # MAKE SURE ARDUINO MATRIX HAS EMPTY ROW ON TOP
@@ -37,8 +37,8 @@ arduinoMatrix = pd.read_csv('components/arduino.csv')
 
 boardImage = imageFuncs.insertImage(boardImage, arduinoImage, 0, ARDUINO_Y, 0)
 boardMatrix = imageFuncs.insertMatrix(boardMatrix, arduinoMatrix, 0, ARDUINO_Y, 0)
-cv2.imshow('Board image', boardImage)
-cv2.waitKey(0)
+# cv2.imshow('Board image', boardImage)
+# cv2.waitKey(0)
 
 
 
@@ -67,21 +67,43 @@ for j in range (len(adjMatrix)):
 
 			# 5. PLACE THE COMPONENT
 			arduinoPinCoord = allComponents.allComponents['arduino'][arduinoPin]
+			componentPinCoord = allComponents.allComponents[otherComponent][otherComponent + '1']
 			componentHeight = componentMatrix.shape[0]
 			componentWidth = componentMatrix.shape[1]
 			componentX = arduinoPinCoord[0]+1 -int(componentWidth/2)
 			componentY = arduinoPinCoord[1]+1 + ARDUINO_Y
 			if (arduinoPinNumber < 15):
 				componentY = componentY - int(componentHeight*1.4)
+			else:
+				componentY = componentY + 2
 			boardImage = imageFuncs.insertImage(boardImage, componentImage, componentX, componentY, 0)
 			boardMatrix = imageFuncs.insertMatrix(boardMatrix, componentMatrix, componentX, componentY, 0)
 			
 			# 6. HIGHTLIGHT THE TWO PINS ON A MASK
-			mask = blank_image = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
-			mask = cv2.circle(mask, (arduinoPinCoord[0]+1, arduinoPinCoord[1]+1), 10, (255, 0, 0), -1)
-
-			cv2.imshow('Board image', mask)
+			mask = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+			mask = imageFuncs.insertCircle(mask, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (255, 255, 255))
+			mask = imageFuncs.insertCircle(mask, arduinoPinCoord[0] + 1, arduinoPinCoord[1] + ARDUINO_Y, (255, 255, 255))
+			mask = cv2.bitwise_not(mask)
+			circleImg = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+			circleImg = imageFuncs.insertCircle(circleImg, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (255, 0, 255))
+			circleImg = imageFuncs.insertCircle(circleImg, arduinoPinCoord[0] + 1, arduinoPinCoord[1] + ARDUINO_Y, (255, 0, 255))
+			maskedBoard = cv2.bitwise_and(boardImage, mask)
+			boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
+			cv2.imshow('Board image', boardWithDots)
 			cv2.waitKey(0)
+
+			# 7. HIGHLIGHT THE GROUND NODE (if buzzer or button)
+			if (otherComponent == 'buzzer' or otherComponent == 'button'):
+				componentPinCoord = allComponents.allComponents[otherComponent][otherComponent + '2']
+				mask = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+				mask = imageFuncs.insertCircle(mask, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (255, 255, 255))
+				mask = cv2.bitwise_not(mask)
+				circleImg = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+				circleImg = imageFuncs.insertCircle(circleImg, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (0, 255, 255))
+				maskedBoard = cv2.bitwise_and(boardImage, mask)
+				boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
+				cv2.imshow('Board image', boardWithDots)
+				cv2.waitKey(0)
 
 
 			

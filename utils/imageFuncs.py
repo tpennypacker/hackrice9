@@ -49,10 +49,10 @@ def insertMatrix(l_mat, s_mat, x, y, theta):
     l_mat[y:y+s_mat.shape[0], x:x+s_mat.shape[1]] = s_mat
     return l_mat
 
-def insertCircle(l_img, x, y):
+def insertCircle(l_img, x, y, color):
     y = int(y * (l_img.shape[0] / 78))
     x = int(x * (l_img.shape[1] / 126))
-    return cv2.circle(mask, (x,y), 10, (255, 0, 0), -1)
+    return cv2.circle(l_img, (x,y), 7, color, -1)
 
 def insertComponent(board, component):
     
@@ -69,3 +69,10 @@ def printMatrix(matrix):
 
 def drawSolder(board, x0, y0, x1, y1):
     return cv2.line(board, (x0, y0), (x1, y1), (50,50,50), 1)
+
+
+
+
+
+
+
