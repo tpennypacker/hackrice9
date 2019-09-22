@@ -1,0 +1,36 @@
+* D:\odrive\Google Drive Upenn SEAS\Side projects\HackRice PCB Routing project\Library\Pong.asc
+XArduino N001 NC_01 NC_02 NC_03 N007 NC_04 N008 N009 N005 NC_05 NC_06 0 NC_07 NC_08 NC_09 NC_10 NC_11 NC_12 NC_13 N013 N015 NC_14 NC_15 N017 N018 NC_16 3V3 N002 arduino
+XUpButton N017 0 button
+XDownButton N018 0 button
+XLED 5V N014 N016 NC_17 kingbrightled
+R1 N014 N013 200
+R2 N016 N015 300
+XBuzzer N007 0 button
+XLevelShifter NC_18 NC_19 N009 N008 NC_20 NC_21 N011 N012 NC_22 NC_23 0 NC_24 5V 3V3 levelshifter
+XLevelShifter1 NC_25 NC_26 NC_27 N006 N004 N003 NC_28 N005 N001 N002 0 NC_29 3V3 5V levelshifter
+R3 N010 3V3 300
+XLCDscreen 3V3 0 N012 N011 N006 N004 N003 N010 nokialcd
+
+* block symbol definitions
+.subckt arduino D12~ D11~ D10~ D9~ D8 D7 D6~ D5~ D4 D3~ D2 GND RX0 TX1 VIN RST 5V A7 A6 A5 A4 A3 A2 A1 A0 VREF 3V3 D13
+.ends arduino
+
+.subckt button A B
+.ends button
+
+.subckt kingbrightled Anode R G B
+D1 Anode R D
+D2 Anode G D
+D3 Anode B D
+.ends kingbrightled
+
+.subckt levelshifter 10 6 A1 A2 A3 A4 B1 B2 B3 B4 GND OE VccA VccB
+.ends levelshifter
+
+.subckt nokialcd VCC GND SCE RST D/C DN SCLK LED
+.ends nokialcd
+
+.model D D
+.lib C:\Users\nikil\Documents\LTspiceXVII\lib\cmp\standard.dio
+.backanno
+.end

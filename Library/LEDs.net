@@ -1,0 +1,38 @@
+* D:\odrive\Google Drive Upenn SEAS\Side projects\HackRice PCB Routing project\Library\LEDs.asc
+XArduino NC_01 NC_02 N002 NC_03 NC_04 NC_05 NC_06 N005 NC_07 NC_08 NC_09 0 NC_10 NC_11 USB5V NC_12 5V NC_13 NC_14 NC_15 NC_16 NC_17 NC_18 N007 N008 NC_19 3V3 NC_20 arduino
+XBrightnessButton N007 0 button
+XColorButton N008 0 button
+XBoost2700 N002 USB5V N001 N003 boost
+XBoost5700 N005 USB5V N004 N006 boost
+D2700 N001 N003 D
+D5700 N004 N006 D
+XUSBConnector USB5V NC_21 NC_22 NC_23 NC_24 NC_25 NC_26 0 usbc
+
+* block symbol definitions
+.subckt arduino D12~ D11~ D10~ D9~ D8 D7 D6~ D5~ D4 D3~ D2 GND RX0 TX1 VIN RST 5V A7 A6 A5 A4 A3 A2 A1 A0 VREF 3V3 D13
+.ends arduino
+
+.subckt button A B
+.ends button
+
+.subckt boost DIM VIN VOUT FB
+C1 0 N001 2.2µ
+C2 VOUT 0 10µ
+R1 0 VOUT .27
+L1 N002 N003 10µ
+D1 N003 VOUT D
+XX1 N001 VIN DIM VOUT 0 N002 0 boostcontroller
+.ends boost
+
+.subckt usbc VBUS D+ D- CC1 CC2 SBU1 SBU2 GND
+R1 CC2 GND 5.1k
+R2 CC1 GND 5.1k
+.ends usbc
+
+.subckt boostcontroller PGND VIN DIM FB AGND SW PAD
+.ends boostcontroller
+
+.model D D
+.lib C:\Users\nikil\Documents\LTspiceXVII\lib\cmp\standard.dio
+.backanno
+.end

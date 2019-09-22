@@ -1,0 +1,14 @@
+$PACKAGES
+diode! D; D:4:1
+diode! D; D:4:2
+diode! D; D:4:3
+res! 200; R1
+res! 300; R2
+$NETS
+N001;  D:4:1.1 D:4:2.1 D:4:3.1
+N005;  D:4:1.2 R1.1
+N007;  D:4:2.2 R2.1
+NC_24;  D:4:3.2
+N004;  R1.2
+N006;  R2.2
+$END
