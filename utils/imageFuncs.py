@@ -73,9 +73,50 @@ def drawSolder(board, x0, y0, x1, y1):
 
 
 
-def highlightArduinoAndShifter(board, arduinoPin, arduinoCoord, shifterPin, shifterCoord):
+def highlightArduinoAndShifter(board, arduinoPin, shifterPin, shifterCoord):
     arduinoPinCoord = allComponents.allComponents['arduino'][arduinoPin]
     shifterPinCoord = allComponents.allComponents['shifter'][shifterPin]
+
+    arduinoCircleCoordX = arduinoPinCoord[0] + 1
+    arduinoCircleCoordY = arduinoPinCoord[1] + 23
+
+    shifterCircleCoordX = shifterCoord[0] + shifterPinCoord[0]
+    shifterCircleCoordY = shifterCoord[1] + shifterPinCoord[1] + 1
+
+    newBoard = insertCircle(board, arduinoCircleCoordX, arduinoCircleCoordY, (255, 0, 255))
+    newBoard = insertCircle(newBoard, shifterCircleCoordX, shifterCircleCoordY, (255, 0, 255))
+
+    return newBoard
+
+
+def highlightLcdAndShifter(board, lcdPin, shifterPin, shifterCoord):
+    lcdPinCoord = allComponents.allComponents['lcd'][lcdPin]
+    shifterPinCoord = allComponents.allComponents['shifter'][shifterPin]
+
+    #lcdCoord = [116, 3]
+    lcdCircleCoordX = lcdPinCoord[0] + 117
+    lcdCircleCoordY = lcdPinCoord[1] + 3
+
+    shifterCircleCoordX = shifterCoord[0] + shifterPinCoord[0]
+    shifterCircleCoordY = shifterCoord[1] + shifterPinCoord[1] + 1
+
+    newBoard = insertCircle(board, lcdCircleCoordX, lcdCircleCoordY, (255, 0, 255))
+    newBoard = insertCircle(newBoard, shifterCircleCoordX, shifterCircleCoordY, (255, 0, 255))
+
+    return newBoard
+
+
+def shifterToGround(board, shifterPin, shifterCoord):
+    shifterPinCoord = allComponents.allComponents['shifter'][shifterPin]
+    shifterCircleCoordX = shifterCoord[0] + shifterPinCoord[0]
+    shifterCircleCoordY = shifterCoord[1] + shifterPinCoord[1] + 1
+    newBoard = insertCircle(board, shifterCircleCoordX, shifterCircleCoordY, (255, 0, 255))
+    return
+
+
+
+
+
 
 
 

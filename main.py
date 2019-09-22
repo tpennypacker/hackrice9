@@ -13,6 +13,16 @@ ARDUINO_WIDTH = 63*2
 firstResistor = True
 firstShifter = True
 
+imgNum = 0
+
+def showImage(img):
+	global imgNum
+	# cv2.imshow('Board image', img)
+	# cv2.waitKey(0)
+	cv2.imwrite('output/image' + str(imgNum) + '.png', img)
+	imgNum += 1
+
+
 
 os.system('clear')
 
@@ -26,12 +36,19 @@ adjMatrix[pinlist.index('arduino24')][pinlist.index('button1')] = 1
 
 # 1. LOAD BOARD IMAGE AND BOARD MATRIX
 boardImage = cv2.imread('images/board.png', cv2.IMREAD_UNCHANGED)
+
+
+## black background
+mask = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+boardImage = cv2.bitwise_and(boardImage, mask)
+
+
 print("Board image width: " + str(boardImage.shape[1]) + ", board image height: " + str(boardImage.shape[0]))
 boardMatrix = np.zeros((ARDUINO_HEIGHT, ARDUINO_WIDTH), dtype=np.int)
 print("Board matrix width: " + str(boardMatrix.shape[1]) + ", board matrix height: " + str(boardMatrix.shape[0]) + '\n')
 
-# cv2.imshow('Board image', boardImage)
-# cv2.waitKey(0)
+showImage(boardImage)
+
 
 # 2. PLACE ARDUINO ON IMAGE AND ARRAY IN PREDEFINED LOCATION
 # MAKE SURE ARDUINO MATRIX HAS EMPTY ROW ON TOP
@@ -40,8 +57,7 @@ arduinoMatrix = pd.read_csv('components/arduino.csv')
 
 boardImage = imageFuncs.insertImage(boardImage, arduinoImage, 0, ARDUINO_Y, 0)
 boardMatrix = imageFuncs.insertMatrix(boardMatrix, arduinoMatrix, 0, ARDUINO_Y, 0)
-# cv2.imshow('Board image', boardImage)
-# cv2.waitKey(0)
+showImage(boardImage)
 
 
 
@@ -94,8 +110,7 @@ for j in range (len(adjMatrix)):
 			circleImg = imageFuncs.insertCircle(circleImg, arduinoPinCoord[0] + 1, arduinoPinCoord[1] + ARDUINO_Y, (255, 0, 255))
 			maskedBoard = cv2.bitwise_and(boardImage, mask)
 			boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
-			# cv2.imshow('Board image', boardWithDots)
-			# cv2.waitKey(0)
+			showImage(boardWithDots)
 
 			# 7. HIGHLIGHT THE GROUND NODE (if buzzer or button)
 			if (otherComponent == 'buzzer' or otherComponent == 'button'):
@@ -107,49 +122,104 @@ for j in range (len(adjMatrix)):
 				circleImg = imageFuncs.insertCircle(circleImg, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (0, 255, 255))
 				maskedBoard = cv2.bitwise_and(boardImage, mask)
 				boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
-				# cv2.imshow('Board image', boardWithDots)
-				# cv2.waitKey(0)
+				showImage(boardWithDots)
 
 			# 7.5 IF IT'S THE FIRST RESISTOR, PLACE THE LED
 			elif (firstResistor and otherComponent == 'resistor'):
 				firstResistor = False
 				componentImage = cv2.imread('images/' + 'led' + '.png', cv2.IMREAD_UNCHANGED)
 				boardImage = imageFuncs.insertImage(boardImage, componentImage, componentX - 3, componentY + 3, 0)
-				# cv2.imshow('Board image', boardImage)
-				# cv2.waitKey(0)
+				showImage(boardImage)
 				
 
-# 8. ITERATE THROUGH ADJ MATRIX AND FIND LEVEL SHIFTERS
-for j in range (len(adjMatrix)):
-	for i in range (len(adjMatrix[0])):
-		if (adjMatrix[j][i] == 1):	
-			# 4. WE ONLY CARE ABOUT CONNECTIONS BETWEEN THE ARDUINO AND LEVEL SHIFTER
-			otherPin = ''
-			arduinoPin = ''
-			if (not 'arduino' in pinlist[j] and 'arduino' in pinlist[i]):
-				otherPin = pinlist[j]
-				arduinoPin = pinlist[i]
-			elif ('arduino' in pinlist[j] and not 'arduino' in pinlist[i]):
-				otherPin = pinlist[i]
-				arduinoPin = pinlist[j]
-			else:
-				continue
 
-			# 8. PLACE THE LEVEL SHIFTERS
-			shifterCoord1 = [100, 23]
-			shifterImage = cv2.imread('images/shifter.png', cv2.IMREAD_UNCHANGED)
-			boardImage = imageFuncs.insertImage(boardImage, shifterImage, shifterCoord1[0], shifterCoord1[1], 0)
-			cv2.imshow('Board image', boardImage)
-			cv2.waitKey(0)
+# first level shifter
+shifterCoord = [85, 22]
+shifterImage = cv2.imread('images/shifter.png', cv2.IMREAD_UNCHANGED)
+boardImage = imageFuncs.insertImage(boardImage, shifterImage, shifterCoord[0], shifterCoord[1], 0)
+showImage(boardImage)
 
 
+def arduinoToShifter(pin1num, pin2num):
+	boardCopy = boardImage.copy()
+	pin1name = 'arduino' + str(pin1num)
+	pin2name = 'shifter' + str(pin2num)
+	newBoardImage = imageFuncs.highlightArduinoAndShifter(boardCopy, pin1name, pin2name, shifterCoord)
+	showImage(newBoardImage)
+
+def shifterToGround(pinnum):
+	boardCopy = boardImage.copy()
+	pinname = 'shifter' + str(pinnum)
+	newBoardImage = imageFuncs.shifterToGround(boardCopy, pinname, shifterCoord)
+	showImage(newBoardImage)
+
+# first level shifter connections to Arduino
+arduinoToShifter(30, 12)
+arduinoToShifter(2, 11)
+arduinoToShifter(9, 10)
+arduinoToShifter(19, 8)
+
+# first shifter to ground
+#shifterToGround(1)
+
+# lcd screen
+lcdCoord = [116, 3]
+lcdImage = cv2.imread('images/lcd.png', cv2.IMREAD_UNCHANGED)
+boardImage = imageFuncs.insertImage(boardImage, lcdImage, lcdCoord[0], lcdCoord[1], 0)
+showImage(boardImage)
+
+def lcdToShifter(pin1num, pin2num):
+	boardCopy = boardImage.copy()
+	pin1name = 'lcd' + str(pin1num)
+	pin2name = 'shifter' + str(pin2num)
+	newBoardImage = imageFuncs.highlightLcdAndShifter(boardCopy, pin1name, pin2name, shifterCoord)
+	showImage(newBoardImage)
 
 
+lcdToShifter(3, 2)
+lcdToShifter(4, 3)
+lcdToShifter(5, 4)
+
+# second level shifter
+shifterCoord = [85, 37]
+shifterImage = cv2.imread('images/shifter.png', cv2.IMREAD_UNCHANGED)
+boardImage = imageFuncs.insertImage(boardImage, shifterImage, shifterCoord[0], shifterCoord[1], 0)
+showImage(boardImage)
+
+	
+# second level shifter connections
+arduinoToShifter(19, 14)
+arduinoToShifter(8, 13)
+arduinoToShifter(7, 12)
+lcdToShifter(2, 6)
+lcdToShifter(3, 7)
+#shifterToGround(8)
 
 
+# finishing touches
+resistorImage = cv2.imread('images/resistor.png', cv2.IMREAD_UNCHANGED)
+boardImage = imageFuncs.insertImage(boardImage, resistorImage, 112, 23, 90)
+showImage(boardImage)
 
 
+boardCopy = boardImage.copy()
+boardCopy = imageFuncs.insertCircle(boardCopy, 10, 49, (255, 0, 255))
+boardCopy = imageFuncs.insertCircle(boardCopy, 121, 52, (255, 0, 255))
+boardCopy = imageFuncs.insertCircle(boardCopy, 112, 24, (255, 0, 255))
+boardCopy = imageFuncs.insertCircle(boardCopy, 95, 38, (255, 0, 255))
+boardCopy = imageFuncs.insertCircle(boardCopy, 95, 35, (255, 0, 255))
+showImage(boardCopy)
+
+boardCopy = boardImage.copy()
+boardCopy = imageFuncs.insertCircle(boardCopy, 121, 24, (255, 0, 255))
+boardCopy = imageFuncs.insertCircle(boardCopy, 114, 24, (255, 0, 255))
+cv2.imwrite('output/image1.png', boardCopy)
+showImage(boardCopy)
 
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
+
+
