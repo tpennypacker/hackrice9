@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from components import allComponents
 
 def boundedRotation(image, angle):
     # grab the dimensions of the image and then determine the center
@@ -72,7 +73,9 @@ def drawSolder(board, x0, y0, x1, y1):
 
 
 
-
+def highlightArduinoAndShifter(board, arduinoPin, arduinoCoord, shifterPin, shifterCoord):
+    arduinoPinCoord = allComponents.allComponents['arduino'][arduinoPin]
+    shifterPinCoord = allComponents.allComponents['shifter'][shifterPin]
 
 
 

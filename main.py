@@ -10,6 +10,9 @@ ARDUINO_Y = 23
 ARDUINO_HEIGHT = 39*2
 ARDUINO_WIDTH = 63*2
 
+firstResistor = True
+firstShifter = True
+
 
 os.system('clear')
 
@@ -50,6 +53,8 @@ for j in range (len(adjMatrix)):
 			# 4. WE ONLY CARE ABOUT CONNECTIONS BETWEEN THE ARDUINO AND TWO-PIN COMPONENTS
 			otherPin = ''
 			arduinoPin = ''
+			if ('shifter' in pinlist[j] or 'shifter' in pinlist[i] or 'lcd' in pinlist[j] or 'lcd' in pinlist[i]):
+				continue
 			if (not 'arduino' in pinlist[j] and 'arduino' in pinlist[i]):
 				otherPin = pinlist[j]
 				arduinoPin = pinlist[i]
@@ -89,8 +94,8 @@ for j in range (len(adjMatrix)):
 			circleImg = imageFuncs.insertCircle(circleImg, arduinoPinCoord[0] + 1, arduinoPinCoord[1] + ARDUINO_Y, (255, 0, 255))
 			maskedBoard = cv2.bitwise_and(boardImage, mask)
 			boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
-			cv2.imshow('Board image', boardWithDots)
-			cv2.waitKey(0)
+			# cv2.imshow('Board image', boardWithDots)
+			# cv2.waitKey(0)
 
 			# 7. HIGHLIGHT THE GROUND NODE (if buzzer or button)
 			if (otherComponent == 'buzzer' or otherComponent == 'button'):
@@ -102,17 +107,40 @@ for j in range (len(adjMatrix)):
 				circleImg = imageFuncs.insertCircle(circleImg, componentPinCoord[0] + componentX, componentPinCoord[1] + componentY, (0, 255, 255))
 				maskedBoard = cv2.bitwise_and(boardImage, mask)
 				boardWithDots = cv2.bitwise_or(maskedBoard, circleImg)
-				cv2.imshow('Board image', boardWithDots)
-				cv2.waitKey(0)
+				# cv2.imshow('Board image', boardWithDots)
+				# cv2.waitKey(0)
 
+			# 7.5 IF IT'S THE FIRST RESISTOR, PLACE THE LED
+			elif (firstResistor and otherComponent == 'resistor'):
+				firstResistor = False
+				componentImage = cv2.imread('images/' + 'led' + '.png', cv2.IMREAD_UNCHANGED)
+				boardImage = imageFuncs.insertImage(boardImage, componentImage, componentX - 3, componentY + 3, 0)
+				# cv2.imshow('Board image', boardImage)
+				# cv2.waitKey(0)
+				
 
-			
+# 8. ITERATE THROUGH ADJ MATRIX AND FIND LEVEL SHIFTERS
+for j in range (len(adjMatrix)):
+	for i in range (len(adjMatrix[0])):
+		if (adjMatrix[j][i] == 1):	
+			# 4. WE ONLY CARE ABOUT CONNECTIONS BETWEEN THE ARDUINO AND LEVEL SHIFTER
+			otherPin = ''
+			arduinoPin = ''
+			if (not 'arduino' in pinlist[j] and 'arduino' in pinlist[i]):
+				otherPin = pinlist[j]
+				arduinoPin = pinlist[i]
+			elif ('arduino' in pinlist[j] and not 'arduino' in pinlist[i]):
+				otherPin = pinlist[i]
+				arduinoPin = pinlist[j]
+			else:
+				continue
 
-
-
-	
-
-
+			# 8. PLACE THE LEVEL SHIFTERS
+			shifterCoord1 = [100, 23]
+			shifterImage = cv2.imread('images/shifter.png', cv2.IMREAD_UNCHANGED)
+			boardImage = imageFuncs.insertImage(boardImage, shifterImage, shifterCoord1[0], shifterCoord1[1], 0)
+			cv2.imshow('Board image', boardImage)
+			cv2.waitKey(0)
 
 
 
