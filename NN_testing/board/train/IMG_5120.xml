@@ -1,0 +1,26 @@
+<annotation>
+	<folder>board</folder>
+	<filename>IMG_5120.JPG</filename>
+	<path>C:\Users\alanb\alan\all my stuff\Junior\Hackrice\board\IMG_5120.JPG</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>600</width>
+		<height>600</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>board</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>148</xmin>
+			<ymin>248</ymin>
+			<xmax>453</xmax>
+			<ymax>446</ymax>
+		</bndbox>
+	</object>
+</annotation>
