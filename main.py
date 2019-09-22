@@ -2,50 +2,92 @@ import cv2
 import numpy as np
 import os
 from utils import imageFuncs
-from Component import Component
 import pandas as pd
 import csv
+from components import allComponents
+
+ARDUINO_Y = 23
+ARDUINO_HEIGHT = 39*2
+ARDUINO_WIDTH = 63*2
 
 
 os.system('clear')
 
-pinlist = ['arduino1', 'arduino2', 'arduino3', 'arduino4', 'arduino5', 'arduino6', 'arduino7', 'arduino8', 'arduino9', 'arduino10', 'arduino11', 'arduino12', 'arduino13', 'arduino14', 'arduino15', 'arduino16', 'resistor1', 'resistor2']
-
-df = pd.DataFrame(0, index=pinlist, columns=pinlist)
-df['arduino15']['resistor1'] = 1
-df['resistor1']['arduino15'] = 1
+pinlist = ['arduino1', 'arduino2', 'arduino3', 'arduino4', 'arduino5', 'arduino6', 'arduino7', 'arduino8', 'arduino9', 'arduino10', 'arduino11', 'arduino12', 'arduino13', 'arduino14', 'arduino15', 'arduino16', 'arduino17', 'arduino18', 'arduino19', 'arduino20', 'arduino21', 'arduino22', 'arduino23', 'arduino24', 'arduino25', 'arduino26', 'arduino27', 'arduino28', 'arduino29', 'arduino30', 'resistor1', 'resistor2', 'button1', 'button2', 'buzzer1', 'buzzer2']
+adjMatrix = np.zeros((len(pinlist), len(pinlist)))
+adjMatrix[pinlist.index('arduino21')][pinlist.index('resistor2')] = 1
+adjMatrix[pinlist.index('arduino22')][pinlist.index('resistor2')] = 1
+adjMatrix[pinlist.index('arduino5')][pinlist.index('buzzer2')] = 1
+adjMatrix[pinlist.index('arduino27')][pinlist.index('button1')] = 1
+adjMatrix[pinlist.index('arduino24')][pinlist.index('button1')] = 1
 
 # 1. LOAD BOARD IMAGE AND BOARD MATRIX
 boardImage = cv2.imread('images/board.png', cv2.IMREAD_UNCHANGED)
 print("Board image width: " + str(boardImage.shape[1]) + ", board image height: " + str(boardImage.shape[0]))
-boardMatrix = np.zeros((39*2, 63*2), dtype=np.int)
+boardMatrix = np.zeros((ARDUINO_HEIGHT, ARDUINO_WIDTH), dtype=np.int)
 print("Board matrix width: " + str(boardMatrix.shape[1]) + ", board matrix height: " + str(boardMatrix.shape[0]) + '\n')
 
-
+cv2.imshow('Board image', boardImage)
+cv2.waitKey(0)
 
 # 2. PLACE ARDUINO ON IMAGE AND ARRAY IN PREDEFINED LOCATION
 # MAKE SURE ARDUINO MATRIX HAS EMPTY ROW ON TOP
 arduinoImage = cv2.imread('images/arduino.png', cv2.IMREAD_UNCHANGED)
 arduinoMatrix = pd.read_csv('components/arduino.csv')
 
-boardImage = imageFuncs.insertImage(boardImage, arduinoImage, 0, 23, 0)
-boardMatrix = imageFuncs.insertMatrix(boardMatrix, arduinoMatrix, 0, 23, 0)
+boardImage = imageFuncs.insertImage(boardImage, arduinoImage, 0, ARDUINO_Y, 0)
+boardMatrix = imageFuncs.insertMatrix(boardMatrix, arduinoMatrix, 0, ARDUINO_Y, 0)
+cv2.imshow('Board image', boardImage)
+cv2.waitKey(0)
 
 
 
+# 3. ITERATE THROUGH ADJ MATRIX AND FIND CONNECTIONS
+for j in range (len(adjMatrix)):
+	for i in range (len(adjMatrix[0])):
+		if (adjMatrix[j][i] == 1):
 
-# 3. ITERATE THROUGH ARDUINO PINS, PLACE ALL 2 PIN COMPONENTS ON THE ARDUINO PINS
-for pin in pinlist:
+			# 4. WE ONLY CARE ABOUT CONNECTIONS BETWEEN THE ARDUINO AND TWO-PIN COMPONENTS
+			otherPin = ''
+			arduinoPin = ''
+			if (not 'arduino' in pinlist[j] and 'arduino' in pinlist[i]):
+				otherPin = pinlist[j]
+				arduinoPin = pinlist[i]
+			elif ('arduino' in pinlist[j] and not 'arduino' in pinlist[i]):
+				otherPin = pinlist[i]
+				arduinoPin = pinlist[j]
+			else:
+				continue
 
-	# ignore non arduino pins
-	if (not 'arduino' in pin):
-		continue
+			otherComponent = ''.join(i for i in otherPin if not i.isdigit())
+			componentImage = cv2.imread('images/' + otherComponent + '.png', cv2.IMREAD_UNCHANGED)
+			componentMatrix = pd.read_csv('components/' + otherComponent + '.csv')
+			arduinoPinNumber = pinlist.index(arduinoPin)
 
-	# ignore unconnected pins
-	if (sum(df[pin]) == 0):
-		continue
 
-	print(df[pin])
+			# 5. PLACE THE COMPONENT
+			arduinoPinCoord = allComponents.allComponents['arduino'][arduinoPin]
+			componentHeight = componentMatrix.shape[0]
+			componentWidth = componentMatrix.shape[1]
+			componentX = arduinoPinCoord[0]+1 -int(componentWidth/2)
+			componentY = arduinoPinCoord[1]+1 + ARDUINO_Y
+			if (arduinoPinNumber < 15):
+				componentY = componentY - int(componentHeight*1.4)
+			boardImage = imageFuncs.insertImage(boardImage, componentImage, componentX, componentY, 0)
+			boardMatrix = imageFuncs.insertMatrix(boardMatrix, componentMatrix, componentX, componentY, 0)
+			
+			# 6. HIGHTLIGHT THE TWO PINS ON A MASK
+			mask = blank_image = np.zeros((boardImage.shape[0], boardImage.shape[1], 4), np.uint8)
+			mask = cv2.circle(mask, (arduinoPinCoord[0]+1, arduinoPinCoord[1]+1), 10, (255, 0, 0), -1)
+
+			cv2.imshow('Board image', mask)
+			cv2.waitKey(0)
+
+
+			
+
+
+
 	
 
 
@@ -59,38 +101,5 @@ for pin in pinlist:
 
 
 
-
-# for row in boardMatrix:
-# 	print(', '.join(str(row)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-# components = []
-# components.append(Component('arduino', 100, 100, 45))
-# components.append(Component('diode', 50, 30, 0))
-# components.append(Component('led', 250, 100, 0))
-# components.append(Component('SOIC8', 20, 30, 0))
-
-
-# # load the board image and scale it down
-
-
-# # iterate through the components and put them on the board
-# for component in components:
-#     board = imageFuncs.insertComponent(board, component)
-
-
-# imageFuncs.printMatrix(boardMatrix)
-cv2.imshow('Board image', boardImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

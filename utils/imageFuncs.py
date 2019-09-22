@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from Component import Component
 
 def boundedRotation(image, angle):
     # grab the dimensions of the image and then determine the center
@@ -29,6 +28,7 @@ def insertImage(l_img, s_img, x, y, theta):
     s_img = boundedRotation(s_img, theta)
 
     y = int(y * (l_img.shape[0] / 78))
+    x = int(x * (l_img.shape[1] / 126))
 
     # halfY1 = int(s_img.shape[0] / 2)
     # halfX1 = int(s_img.shape[1] / 2)
@@ -48,6 +48,11 @@ def insertImage(l_img, s_img, x, y, theta):
 def insertMatrix(l_mat, s_mat, x, y, theta):
     l_mat[y:y+s_mat.shape[0], x:x+s_mat.shape[1]] = s_mat
     return l_mat
+
+def insertCircle(l_img, x, y):
+    y = int(y * (l_img.shape[0] / 78))
+    x = int(x * (l_img.shape[1] / 126))
+    return cv2.circle(mask, (x,y), 10, (255, 0, 0), -1)
 
 def insertComponent(board, component):
     
